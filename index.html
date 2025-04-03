@@ -37,6 +37,13 @@
             gap: 10px;
         }
 
+        #big-total {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #d84315;
+            margin-top: 10px;
+        }
+
         .species {
             background: #fff;
             border: 1px solid #ddd;
@@ -73,10 +80,9 @@
     <h1>🐔 Décompte des Poules Officiel</h1>
     <div id="intro"></div>
 
-    <div class="counter" id="total">Total : Chargement...</div>
     <div class="counter" id="eggs">Œufs en vente : Chargement...</div>
 
-    <h2>Par espèce (40 espèces mythiques) :</h2>
+    <h2>Par espèce :</h2>
     <div class="species-container" id="speciesContainer"></div>
 
     <button id="adopt-btn">Adopter une poule 🐣</button>
@@ -108,19 +114,20 @@
         }
 
         function updateCounters() {
-            const total = getRandomInt(300000, 350000);
-            const eggs = getRandomInt(10000, 60000);
-
-            document.getElementById("total").textContent = "Total : " + total.toLocaleString();
-            document.getElementById("eggs").textContent = "Œufs en vente : " + eggs.toLocaleString();
-
+            const total = getRandomInt(3000000, 3000100);
+            const eggs = getRandomInt(31600, 32400);  // autour de 32k
             // Date texte d'intro
             const now = new Date();
             const dateStr = now.toLocaleDateString("fr-FR");
             const timeStr = now.toLocaleTimeString("fr-FR", { hour: '2-digit', minute: '2-digit' });
-            document.getElementById("intro").textContent =
-                `Propriétaire exploitant d’une ferme avicole bio plein air. Calibre moyen 4. Effectif au ${dateStr} ${timeStr} : ${total.toLocaleString()}`;
 
+            document.getElementById("eggs").textContent = "Œufs en vente : " + eggs.toLocaleString();
+
+            document.getElementById("intro").innerHTML = `
+  <p>Propriétaire exploitant d’une ferme avicole bio plein air. Calibre moyen 4.</p>
+  <p>Effectif au ${dateStr} ${timeStr} :</p>
+  <div id="big-total">${total.toLocaleString()}</div>
+`;
             // Répartition aléatoire
             let remaining = total;
             const counts = speciesNames.map((_, i) => {
