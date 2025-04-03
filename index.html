@@ -127,90 +127,56 @@
             }
         }
 
-        @keyframes shake {
-            0% {
-                transform: translate(1px, 1px);
-            }
-
-            25% {
-                transform: translate(-2px, -1px);
-            }
-
-            50% {
-                transform: translate(2px, 2px);
-            }
-
-            75% {
-                transform: translate(-1px, 1px);
-            }
-
-            100% {
-                transform: translate(0, 0);
-            }
-        }
-
-        #fox-alert {
+        .attack-popup {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
+            width: 250px;
+            background: #fff3e0;
+            border: 2px solid #ff9800;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
             z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            animation: popin 0.3s ease;
         }
 
-        .fox-content {
-            background: #fff;
-            padding: 30px;
-            border-radius: 16px;
-            text-align: center;
-            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
-        }
-
-        .fox-content img {
-            max-width: 200px;
-            margin: 15px 0;
-        }
-
-        .fox-content h2 {
-            font-size: 2rem;
+        .attack-popup img {
+            max-width: 100%;
+            border-radius: 6px;
             margin-bottom: 10px;
         }
 
-        .fox-content button {
-            margin: 10px;
-            padding: 10px 20px;
-            font-size: 1rem;
+        .attack-popup button {
+            display: block;
+            width: 100%;
+            padding: 8px;
+            background: #ffcc80;
             border: none;
-            border-radius: 8px;
+            border-radius: 6px;
             cursor: pointer;
         }
 
-        .fox-content button:first-of-type {
-            background: #ddd;
-        }
+        @keyframes popin {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
 
-        .fox-content button:last-of-type {
-            background: #ffab91;
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
         }
     </style>
-
 </head>
 
 <body>
     <h1>🐔 Décompte de Poules Officiel</h1>
     <div id="intro"></div>
-
     <div class="counter" id="eggs">Œufs en vente : Chargement...</div>
-
     <h2>Par espèce :</h2>
     <div class="species-container" id="speciesContainer"></div>
 
     <button id="adopt-btn">Adopter une poule 🐣</button>
-
     <button id="feed-btn">🍽️ Nourrir les poules</button>
     <button id="donate-btn">🦊 Faire un don</button>
 
@@ -228,47 +194,46 @@
         🌙 Éteindre le poulailler
     </button>
 
-
-
+    <div id="attack-container"></div>
+    <img src="https://media.tenor.com/6aXqSvmYp9sAAAAi/chicken.gif" alt="poule qui court" id="runner-chicken">
     <audio id="cluck-sound" src="poule.mp3" preload="auto"></audio>
 
     <script>
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
 
-        // Données pour la poule en vedette
-        const chickenNames = ["Karimette", "Clémentine", "Ginette", "Coco", "Jean-Poule", "Gertrude", "Chickzilla", "Kevin", "Poulinette", "Laurette"];
+        const speciesNames = [...Array(40).keys()].map(i => `Espèce ${i + 1}`);
+        const chickenNames = ["Yacot", "Galex", "Poulimax", "Cocasile", "Robecot", "Caillœuf", "Sarotte", "Remix"];
         const behaviors = [
-            "Elle a l'index surdéveloppé.",
-            "Elle est toute petite",
             "Elle picore les cailloux avec passion.",
             "Elle médite face au soleil levant.",
             "Elle dort sur une seule patte pour impressionner les autres.",
             "Elle a tenté de s’échapper en creusant un tunnel.",
             "Elle pond uniquement en musique classique.",
-            "Elle a peur des œufs.",
-            "Elle suit un régime sans maïs.",
-            "Elle pense qu’elle est un canard."
+            "Elle pense qu’elle est un canard.",
+            "Elle a installé Linux sur sa mangeoire.",
+            "Elle fait des figures de breakdance quand il pleut.",
+            "Elle croit qu’elle descend du T-Rex.",
+            "Elle fait du stand-up au coin de la grange."
         ];
 
+        const speciesContainer = document.getElementById("speciesContainer");
+        const speciesElements = {};
 
-        const speciesNames = [
-            "Rousse", "Blanche", "Noire", "Cendrée", "Marans", "Gâtinaise", "Hollandaise", "Soie", "Araucana", "Sussex",
-            "Pékin", "Leghorn", "Coucou", "Orpington", "Barbezieux", "Wyandotte", "Faverolles", "Bresse", "Brahma", "Padoue",
-            "Australorp", "Sebright", "Java", "Sumatra", "Ancona", "Vorwerk", "Hambourg", "Langshan", "Campine", "Sultan",
-            "Dorking", "Minorque", "Maline", "Crèvecœur", "Rhode Island", "Plymouth", "New Hampshire", "Chantecler", "Cochin", "Lakenvelder"
-        ];
+        speciesNames.forEach(name => {
+            const div = document.createElement("div");
+            div.className = "species";
+            div.innerHTML = `<strong>${name}</strong><br><span id="sp-${name}">0</span>`;
+            speciesContainer.appendChild(div);
+            speciesElements[name] = div.querySelector("span");
+        });
 
-        function updateStarChicken() {
-            const name = chickenNames[getRandomInt(0, chickenNames.length - 1)];
-            const species = speciesNames[getRandomInt(0, speciesNames.length - 1)];
-            const behavior = behaviors[getRandomInt(0, behaviors.length - 1)];
-            document.getElementById("chicken-name").textContent = `${name} la ${species}`;
-            document.getElementById("chicken-behavior").textContent = behavior;
-        }
-        updateStarChicken();
-        setInterval(updateStarChicken, 7000); // change toutes les 7 secondes
-
-        // Compteur d’adoption
+        let isNight = false;
+        let countersActive = true;
         let adoptedCount = 0;
+        const sound = document.getElementById("cluck-sound");
+
         document.getElementById("adopt-btn").addEventListener("click", () => {
             sound.currentTime = 0;
             sound.play();
@@ -276,18 +241,6 @@
             document.getElementById("adopted-count").textContent = adoptedCount;
             alert("Félicitations ! Une poule vous a adopté en retour 🐔❤️");
         });
-
-        // Mode nuit
-        let isNight = false;
-        let countersActive = true;
-
-        document.getElementById("toggle-night").addEventListener("click", () => {
-            isNight = !isNight;
-            document.body.classList.toggle("night-mode", isNight);
-            countersActive = !isNight;
-            document.getElementById("toggle-night").textContent = isNight ? "☀️ Réveiller le poulailler" : "🌙 Éteindre le poulailler";
-        });
-
 
         document.getElementById("feed-btn").addEventListener("click", () => {
             alert("🍽️ Les poules picorent joyeusement dans l’herbe !");
@@ -297,40 +250,34 @@
             alert("🦊 Merci ! Votre don aidera à construire une barrière anti-renards !");
         });
 
-        const speciesContainer = document.getElementById("speciesContainer");
-        const sound = document.getElementById("cluck-sound");
-
-        const speciesElements = {};
-        speciesNames.forEach(name => {
-            const div = document.createElement("div");
-            div.className = "species";
-            div.innerHTML = `<strong>${name}</strong><br><span id="sp-${name}">0</span>`;
-            speciesContainer.appendChild(div);
-            speciesElements[name] = div.querySelector("span");
+        document.getElementById("toggle-night").addEventListener("click", () => {
+            isNight = !isNight;
+            document.body.classList.toggle("night-mode", isNight);
+            countersActive = !isNight;
+            document.getElementById("toggle-night").textContent = isNight ? "☀️ Réveiller le poulailler" : "🌙 Éteindre le poulailler";
         });
 
-        function getRandomInt(min, max) {
-            return Math.floor(Math.random() * (max - min + 1)) + min;
-        }
-
         function updateCounters() {
-            if (!countersActive) return;
 
-            const total = getRandomInt(3000000, 3000050);
-            const eggs = getRandomInt(31600, 32400);
 
-            // Affiche dans intro
+            const total = getRandomInt(30000000, 30001000);
+
+
+            const eggs = getRandomInt(350000, 355000);
+
             const now = new Date();
             const dateStr = now.toLocaleDateString("fr-FR");
             const timeStr = now.toLocaleTimeString("fr-FR", { hour: '2-digit', minute: '2-digit' });
+
             document.getElementById("intro").innerHTML = `
-    <p>Propriétaire exploitant d’une ferme avicole bio plein air. Calibre moyen 4.</p>
-    <p>Effectif au ${dateStr} ${timeStr} :</p>
-    <div id="big-total">${total.toLocaleString()}</div>
-  `;
+        <p>Propriétaire exploitant d’une ferme avicole bio plein air. Calibre moyen 4.</p>
+        <p>Effectif au ${dateStr} ${timeStr} :</p>
+        <div id="big-total">${total.toLocaleString()}</div>
+      `;
 
-            document.getElementById("eggs").textContent = "Œufs en vente : " + eggs.toLocaleString();
-
+            if (countersActive) {
+                document.getElementById("eggs").textContent = "Œufs en vente : " + eggs.toLocaleString();
+            }
             let remaining = total;
             const counts = speciesNames.map((_, i) => {
                 if (i === speciesNames.length - 1) return remaining;
@@ -344,52 +291,86 @@
             });
         }
 
-        setInterval(updateCounters, 400);
+        function updateStarChicken() {
+            const name = chickenNames[getRandomInt(0, chickenNames.length - 1)];
+            const species = speciesNames[getRandomInt(0, speciesNames.length - 1)];
+            const behavior = behaviors[getRandomInt(0, behaviors.length - 1)];
+            document.getElementById("chicken-name").textContent = `${name} la ${species}`;
+            document.getElementById("chicken-behavior").textContent = behavior;
+        }
 
-        // Joue le son toutes les 2000ms (2s)
+        updateCounters();
+        updateStarChicken();
+        setInterval(updateCounters, 400);
+        setInterval(updateStarChicken, 7000);
         setInterval(() => {
             sound.currentTime = 0;
             sound.play();
-        }, 5000);
-
-        updateCounters();
-
-        function showFoxAlert() {
-            const dead = getRandomInt(1, 15);
-            document.getElementById("fox-text").textContent = `😱 ${dead} poules ont péri courageusement !`;
-            document.getElementById("fox-alert").style.display = "flex";
-        }
-
-        function closeFoxAlert() {
-            document.getElementById("fox-alert").style.display = "none";
-        }
-
-        function donateAndClose() {
-            closeFoxAlert();
-            setTimeout(() => {
-                alert("🦊 Merci pour votre don ! Une barrière anti-renards sera bientôt installée !");
-            }, 100); // petit délai pour laisser le popup se fermer proprement
-        }
-
-        // Toutes les 60 secondes → une attaque de renard (si pas en mode nuit)
-        setInterval(() => {
-            if (!isNight) showFoxAlert();
         }, 8000);
 
+        const attackers = [
+            {
+                name: "Renard 🦊",
+                image: "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExdzgyd3NranpzejZyZW9rdW16c2xvNzg2cTA1a2FwcnpueWZ0YnJwaCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/qkdTy6tTmF7Xy/giphy.gif"
+            },
+            {
+                name: "Faucon 🦅",
+                image: "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExOXptZnFlbGcyOGY5eGtwenI3NHlhMzR4NDFydW96ZXZvMG02aGdjMyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/Qy2wmxsj4Wt8c/giphy.gif"
+            },
+            {
+                name: "Buse 🪶",
+                image: "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExajQyMmpkMzBydnFybTQ4dzFqNTVpbTU2OXo1ZDg4YjAzZWRpbzV2eCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/E8BKRmebpiire/giphy.gif"
+            },
+            {
+                name: "Chien de chasse 🐕‍🦺",
+                image: "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExZ21kcThzbWNtMXpibDJ2d2VmN280aTEzdjFvb3B2ZzA5dHFoaGh6aiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/BljyqWcOlAsDK/giphy.gif"
+            },
+            {
+                name: "Martre 🐿️",
+                image: "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExNXNlaWJic254OGt2MmRucGplam13bmNrNjk5NHN1ZTJrOWExOGllZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/nmBp65okZgmvJPV3DJ/giphy.gif"
+            },
+            {
+                name: "Fouine 🐾",
+                image: "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExaGpqdmIwajR3OXh3NWdncXpkbHdxZHoxY2Zlc3ViNTFqaHF1d2wxaCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/gDphuQp5u9SRq/giphy.gif"
+            }
+        ];
+
+        function spawnAttackPopup() {
+            const attacker = attackers[getRandomInt(0, attackers.length - 1)];
+            const dead = getRandomInt(1, 6);
+
+            const div = document.createElement("div");
+            div.className = "attack-popup";
+
+            const x = Math.random() * (window.innerWidth - 260);
+            const y = Math.random() * (window.innerHeight - 260);
+            div.style.left = `${x}px`;
+            div.style.top = `${y}px`;
+
+            div.innerHTML = `
+        <strong>Attaque de ${attacker.name} !!!</strong><br>
+        <img src="${attacker.image}" alt="${attacker.name}" />
+        <p>😱 ${dead} poules ont péri courageusement !</p>
+        <button onclick="donateAndRemove(this)">Faire un don 🪙</button>
+      `;
+
+            document.getElementById("attack-container").appendChild(div);
+            setTimeout(() => div.remove(), 15000);
+        }
+
+        function donateAndRemove(button) {
+            button.parentElement.remove();
+            alert("🙏 Merci pour votre don ! Une barrière de plus contre les prédateurs !");
+        }
+
+        setInterval(() => {
+            const numberOfAttacks = getRandomInt(1, 3);
+            for (let i = 0; i < numberOfAttacks; i++) {
+                setTimeout(spawnAttackPopup, i * 300);
+            }
+        }, 10000);
 
     </script>
-    <img src="https://media.tenor.com/6aXqSvmYp9sAAAAi/chicken.gif" alt="poule qui court" id="runner-chicken">
-    <div id="fox-alert" style="display: none;">
-        <div class="fox-content">
-            <h2>🦊 Attaque de renard !</h2>
-            <img src="https://media.tenor.com/PY4HzcBMTe0AAAAC/fox-run.gif" alt="Renard" />
-            <p id="fox-text">Des poules ont disparu...</p>
-            <button onclick="closeFoxAlert()">Ignorer</button>
-            <button onclick="donateAndClose()">Faire un don 🦊💰</button>
-
-        </div>
-    </div>
-
 </body>
 
 </html>
