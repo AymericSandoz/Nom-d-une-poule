@@ -203,7 +203,12 @@
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
 
-        const speciesNames = [...Array(40).keys()].map(i => `Espèce ${i + 1}`);
+        const speciesNames = [
+            "Rousse", "Blanche", "Noire", "Cendrée", "Marans", "Gâtinaise", "Hollandaise", "Soie", "Araucana", "Sussex",
+            "Pékin", "Leghorn", "Coucou", "Orpington", "Barbezieux", "Wyandotte", "Faverolles", "Bresse", "Brahma", "Padoue",
+            "Australorp", "Sebright", "Java", "Sumatra", "Ancona", "Vorwerk", "Hambourg", "Langshan", "Campine", "Sultan",
+            "Dorking", "Minorque", "Maline", "Crèvecœur", "Rhode Island", "Plymouth", "New Hampshire", "Chantecler", "Cochin", "Lakenvelder"
+        ];
         const chickenNames = ["Yacot", "Galex", "Poulimax", "Cocasile", "Robecot", "Caillœuf", "Sarotte", "Remix"];
         const behaviors = [
             "Elle picore les cailloux avec passion.",
