@@ -107,7 +107,97 @@
             background: #444 !important;
             color: #eee !important;
         }
+
+        #runner-chicken {
+            position: fixed;
+            bottom: 20px;
+            left: -150px;
+            height: 100px;
+            z-index: 999;
+            animation: runChicken 10s linear infinite;
+        }
+
+        @keyframes runChicken {
+            0% {
+                left: -150px;
+            }
+
+            100% {
+                left: 100vw;
+            }
+        }
+
+        @keyframes shake {
+            0% {
+                transform: translate(1px, 1px);
+            }
+
+            25% {
+                transform: translate(-2px, -1px);
+            }
+
+            50% {
+                transform: translate(2px, 2px);
+            }
+
+            75% {
+                transform: translate(-1px, 1px);
+            }
+
+            100% {
+                transform: translate(0, 0);
+            }
+        }
+
+        #fox-alert {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .fox-content {
+            background: #fff;
+            padding: 30px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+        }
+
+        .fox-content img {
+            max-width: 200px;
+            margin: 15px 0;
+        }
+
+        .fox-content h2 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .fox-content button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .fox-content button:first-of-type {
+            background: #ddd;
+        }
+
+        .fox-content button:last-of-type {
+            background: #ffab91;
+        }
     </style>
+
 </head>
 
 <body>
@@ -226,7 +316,7 @@
         function updateCounters() {
             if (!countersActive) return;
 
-            const total = getRandomInt(300000, 350000);
+            const total = getRandomInt(3000000, 3000050);
             const eggs = getRandomInt(31600, 32400);
 
             // Affiche dans intro
@@ -263,7 +353,43 @@
         }, 5000);
 
         updateCounters();
+
+        function showFoxAlert() {
+            const dead = getRandomInt(1, 15);
+            document.getElementById("fox-text").textContent = `😱 ${dead} poules ont péri courageusement !`;
+            document.getElementById("fox-alert").style.display = "flex";
+        }
+
+        function closeFoxAlert() {
+            document.getElementById("fox-alert").style.display = "none";
+        }
+
+        function donateAndClose() {
+            closeFoxAlert();
+            setTimeout(() => {
+                alert("🦊 Merci pour votre don ! Une barrière anti-renards sera bientôt installée !");
+            }, 100); // petit délai pour laisser le popup se fermer proprement
+        }
+
+        // Toutes les 60 secondes → une attaque de renard (si pas en mode nuit)
+        setInterval(() => {
+            if (!isNight) showFoxAlert();
+        }, 8000);
+
+
     </script>
+    <img src="https://media.tenor.com/6aXqSvmYp9sAAAAi/chicken.gif" alt="poule qui court" id="runner-chicken">
+    <div id="fox-alert" style="display: none;">
+        <div class="fox-content">
+            <h2>🦊 Attaque de renard !</h2>
+            <img src="https://media.tenor.com/PY4HzcBMTe0AAAAC/fox-run.gif" alt="Renard" />
+            <p id="fox-text">Des poules ont disparu...</p>
+            <button onclick="closeFoxAlert()">Ignorer</button>
+            <button onclick="donateAndClose()">Faire un don 🦊💰</button>
+
+        </div>
+    </div>
+
 </body>
 
 </html>
