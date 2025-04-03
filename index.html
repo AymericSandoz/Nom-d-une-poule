@@ -73,6 +73,30 @@
         #adopt-btn:hover {
             background: #ffd54f;
         }
+
+        #feed-btn,
+        #donate-btn {
+            display: block;
+            margin: 15px auto;
+            padding: 10px 20px;
+            font-size: 1.1rem;
+            background: #dcedc8;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        #feed-btn:hover {
+            background: #c5e1a5;
+        }
+
+        #donate-btn {
+            background: #ffe0b2;
+        }
+
+        #donate-btn:hover {
+            background: #ffcc80;
+        }
     </style>
 </head>
 
@@ -87,9 +111,22 @@
 
     <button id="adopt-btn">Adopter une poule 🐣</button>
 
-    <audio id="cluck-sound" src="https://www.fesliyanstudios.com/play-mp3/6960" preload="auto"></audio>
+    <button id="feed-btn">🍽️ Nourrir les poules</button>
+    <button id="donate-btn">🦊 Faire un don</button>
+
+
+    <audio id="cluck-sound" src="poule.mp3" preload="auto"></audio>
 
     <script>
+
+        document.getElementById("feed-btn").addEventListener("click", () => {
+            alert("🍽️ Les poules picorent joyeusement dans l’herbe !");
+        });
+
+        document.getElementById("donate-btn").addEventListener("click", () => {
+            alert("🦊 Merci ! Votre don aidera à construire une barrière anti-renards !");
+        });
+
         const speciesNames = [
             "Rousse", "Blanche", "Noire", "Cendrée", "Marans", "Gâtinaise", "Hollandaise", "Soie", "Araucana", "Sussex",
             "Pékin", "Leghorn", "Coucou", "Orpington", "Barbezieux", "Wyandotte", "Faverolles", "Bresse", "Brahma", "Padoue",
@@ -140,10 +177,15 @@
             speciesNames.forEach((name, i) => {
                 speciesElements[name].textContent = counts[i].toLocaleString();
             });
+        }
 
+        setInterval(updateCounters, 400);
+
+        // Joue le son toutes les 2000ms (2s)
+        setInterval(() => {
             sound.currentTime = 0;
             sound.play();
-        }
+        }, 5000);
 
         document.getElementById("adopt-btn").addEventListener("click", () => {
             alert("Félicitations ! Une poule vous a adopté en retour 🐔❤️");
