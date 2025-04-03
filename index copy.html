@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Compteur de Poules</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: #fffaf0;
+            padding: 40px;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        #intro {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.2rem;
+        }
+
+        .counter {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .species-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        #big-total {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #d84315;
+            margin-top: 10px;
+        }
+
+        .species {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px 15px;
+            min-width: 160px;
+            text-align: center;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        #adopt-btn:hover {
+            background: #ffd54f;
+        }
+
+        #feed-btn,
+        #donate-btn,
+        #adopt-btn {
+            display: block;
+            margin: 15px auto;
+            padding: 10px 20px;
+            font-size: 1.1rem;
+            background: #dcedc8;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        #adopt-btn {
+            background: #ffe082;
+        }
+
+        #feed-btn:hover {
+            background: #c5e1a5;
+        }
+
+        #donate-btn {
+            background: #ffe0b2;
+        }
+
+        #donate-btn:hover {
+            background: #ffcc80;
+        }
+
+        .night-mode {
+            background: #222;
+            color: #ccc;
+        }
+
+        .night-mode .species {
+            background: #333;
+            border-color: #444;
+            color: #aaa;
+        }
+
+        .night-mode button {
+            background: #444 !important;
+            color: #eee !important;
+        }
+
+        #runner-chicken {
+            position: fixed;
+            bottom: 20px;
+            left: -150px;
+            height: 100px;
+            z-index: 999;
+            animation: runChicken 10s linear infinite;
+        }
+
+        @keyframes runChicken {
+            0% {
+                left: -150px;
+            }
+
+            100% {
+                left: 100vw;
+            }
+        }
+
+        @keyframes shake {
+            0% {
+                transform: translate(1px, 1px);
+            }
+
+            25% {
+                transform: translate(-2px, -1px);
+            }
+
+            50% {
+                transform: translate(2px, 2px);
+            }
+
+            75% {
+                transform: translate(-1px, 1px);
+            }
+
+            100% {
+                transform: translate(0, 0);
+            }
+        }
+
+        #fox-alert {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .fox-content {
+            background: #fff;
+            padding: 30px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+        }
+
+        .fox-content img {
+            max-width: 200px;
+            margin: 15px 0;
+        }
+
+        .fox-content h2 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .fox-content button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .fox-content button:first-of-type {
+            background: #ddd;
+        }
+
+        .fox-content button:last-of-type {
+            background: #ffab91;
+        }
+    </style>
+
+</head>
+
+<body>
+    <h1>🐔 Décompte de Poules Officiel</h1>
+    <div id="intro"></div>
+
+    <div class="counter" id="eggs">Œufs en vente : Chargement...</div>
+
+    <h2>Par espèce :</h2>
+    <div class="species-container" id="speciesContainer"></div>
+
+    <button id="adopt-btn">Adopter une poule 🐣</button>
+
+    <button id="feed-btn">🍽️ Nourrir les poules</button>
+    <button id="donate-btn">🦊 Faire un don</button>
+
+    <div id="star-chicken" style="text-align:center; margin-top:30px;">
+        <h3>🐥 Poule en vedette</h3>
+        <p id="chicken-name">Chargement...</p>
+        <p id="chicken-behavior">...</p>
+    </div>
+
+    <div id="adoption-count" style="text-align:center; margin-top:30px;">
+        🐣 <strong><span id="adopted-count">0</span></strong> poules ont été adoptées grâce à vous.
+    </div>
+
+    <button id="toggle-night" style="margin: 30px auto; display:block;">
+        🌙 Éteindre le poulailler
+    </button>
+
+
+
+    <audio id="cluck-sound" src="poule.mp3" preload="auto"></audio>
+
+    <script>
+
+        // Données pour la poule en vedette
+        const chickenNames = ["Karimette", "Clémentine", "Ginette", "Coco", "Jean-Poule", "Gertrude", "Chickzilla", "Kevin", "Poulinette", "Laurette"];
+        const behaviors = [
+            "Elle a l'index surdéveloppé.",
+            "Elle est toute petite",
+            "Elle picore les cailloux avec passion.",
+            "Elle médite face au soleil levant.",
+            "Elle dort sur une seule patte pour impressionner les autres.",
+            "Elle a tenté de s’échapper en creusant un tunnel.",
+            "Elle pond uniquement en musique classique.",
+            "Elle a peur des œufs.",
+            "Elle suit un régime sans maïs.",
+            "Elle pense qu’elle est un canard."
+        ];
+
+
+        const speciesNames = [
+            "Rousse", "Blanche", "Noire", "Cendrée", "Marans", "Gâtinaise", "Hollandaise", "Soie", "Araucana", "Sussex",
+            "Pékin", "Leghorn", "Coucou", "Orpington", "Barbezieux", "Wyandotte", "Faverolles", "Bresse", "Brahma", "Padoue",
+            "Australorp", "Sebright", "Java", "Sumatra", "Ancona", "Vorwerk", "Hambourg", "Langshan", "Campine", "Sultan",
+            "Dorking", "Minorque", "Maline", "Crèvecœur", "Rhode Island", "Plymouth", "New Hampshire", "Chantecler", "Cochin", "Lakenvelder"
+        ];
+
+        function updateStarChicken() {
+            const name = chickenNames[getRandomInt(0, chickenNames.length - 1)];
+            const species = speciesNames[getRandomInt(0, speciesNames.length - 1)];
+            const behavior = behaviors[getRandomInt(0, behaviors.length - 1)];
+            document.getElementById("chicken-name").textContent = `${name} la ${species}`;
+            document.getElementById("chicken-behavior").textContent = behavior;
+        }
+        updateStarChicken();
+        setInterval(updateStarChicken, 7000); // change toutes les 7 secondes
+
+        // Compteur d’adoption
+        let adoptedCount = 0;
+        document.getElementById("adopt-btn").addEventListener("click", () => {
+            sound.currentTime = 0;
+            sound.play();
+            adoptedCount++;
+            document.getElementById("adopted-count").textContent = adoptedCount;
+            alert("Félicitations ! Une poule vous a adopté en retour 🐔❤️");
+        });
+
+        // Mode nuit
+        let isNight = false;
+        let countersActive = true;
+
+        document.getElementById("toggle-night").addEventListener("click", () => {
+            isNight = !isNight;
+            document.body.classList.toggle("night-mode", isNight);
+            countersActive = !isNight;
+            document.getElementById("toggle-night").textContent = isNight ? "☀️ Réveiller le poulailler" : "🌙 Éteindre le poulailler";
+        });
+
+
+        document.getElementById("feed-btn").addEventListener("click", () => {
+            alert("🍽️ Les poules picorent joyeusement dans l’herbe !");
+        });
+
+        document.getElementById("donate-btn").addEventListener("click", () => {
+            alert("🦊 Merci ! Votre don aidera à construire une barrière anti-renards !");
+        });
+
+        const speciesContainer = document.getElementById("speciesContainer");
+        const sound = document.getElementById("cluck-sound");
+
+        const speciesElements = {};
+        speciesNames.forEach(name => {
+            const div = document.createElement("div");
+            div.className = "species";
+            div.innerHTML = `<strong>${name}</strong><br><span id="sp-${name}">0</span>`;
+            speciesContainer.appendChild(div);
+            speciesElements[name] = div.querySelector("span");
+        });
+
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function updateCounters() {
+            if (!countersActive) return;
+
+            const total = getRandomInt(3000000, 3000050);
+            const eggs = getRandomInt(31600, 32400);
+
+            // Affiche dans intro
+            const now = new Date();
+            const dateStr = now.toLocaleDateString("fr-FR");
+            const timeStr = now.toLocaleTimeString("fr-FR", { hour: '2-digit', minute: '2-digit' });
+            document.getElementById("intro").innerHTML = `
+    <p>Propriétaire exploitant d’une ferme avicole bio plein air. Calibre moyen 4.</p>
+    <p>Effectif au ${dateStr} ${timeStr} :</p>
+    <div id="big-total">${total.toLocaleString()}</div>
+  `;
+
+            document.getElementById("eggs").textContent = "Œufs en vente : " + eggs.toLocaleString();
+
+            let remaining = total;
+            const counts = speciesNames.map((_, i) => {
+                if (i === speciesNames.length - 1) return remaining;
+                const count = getRandomInt(0, Math.floor(remaining / 2));
+                remaining -= count;
+                return count;
+            });
+
+            speciesNames.forEach((name, i) => {
+                speciesElements[name].textContent = counts[i].toLocaleString();
+            });
+        }
+
+        setInterval(updateCounters, 400);
+
+        // Joue le son toutes les 2000ms (2s)
+        setInterval(() => {
+            sound.currentTime = 0;
+            sound.play();
+        }, 5000);
+
+        updateCounters();
+
+        function showFoxAlert() {
+            const dead = getRandomInt(1, 15);
+            document.getElementById("fox-text").textContent = `😱 ${dead} poules ont péri courageusement !`;
+            document.getElementById("fox-alert").style.display = "flex";
+        }
+
+        function closeFoxAlert() {
+            document.getElementById("fox-alert").style.display = "none";
+        }
+
+        function donateAndClose() {
+            closeFoxAlert();
+            setTimeout(() => {
+                alert("🦊 Merci pour votre don ! Une barrière anti-renards sera bientôt installée !");
+            }, 100); // petit délai pour laisser le popup se fermer proprement
+        }
+
+        // Toutes les 60 secondes → une attaque de renard (si pas en mode nuit)
+        setInterval(() => {
+            showFoxAlert();
+        }, 5000);
+
+
+    </script>
+    <img src="https://media.tenor.com/6aXqSvmYp9sAAAAi/chicken.gif" alt="poule qui court" id="runner-chicken">
+    <div id="fox-alert" style="display: none;">
+        <div class="fox-content">
+            <h2>🦊 Attaque de renard !</h2>
+            <img src="https://media.tenor.com/PY4HzcBMTe0AAAAC/fox-run.gif" alt="Renard" />
+            <p id="fox-text">Des poules ont disparu...</p>
+            <button onclick="closeFoxAlert()">Ignorer</button>
+            <button onclick="donateAndClose()">Faire un don 🦊💰</button>
+
+        </div>
+    </div>
+
+</body>
+
+</html>
