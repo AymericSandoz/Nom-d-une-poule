@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Compteur de Poules</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: #fffaf0;
+            padding: 40px;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        #intro {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.2rem;
+        }
+
+        .counter {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .species-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .species {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px 15px;
+            min-width: 160px;
+            text-align: center;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        #adopt-btn {
+            display: block;
+            margin: 30px auto;
+            padding: 10px 20px;
+            font-size: 1.1rem;
+            background: #ffe082;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        #adopt-btn:hover {
+            background: #ffd54f;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🐔 Décompte des Poules Officiel</h1>
+    <div id="intro"></div>
+
+    <div class="counter" id="total">Total : Chargement...</div>
+    <div class="counter" id="eggs">Œufs en vente : Chargement...</div>
+
+    <h2>Par espèce (40 espèces mythiques) :</h2>
+    <div class="species-container" id="speciesContainer"></div>
+
+    <button id="adopt-btn">Adopter une poule 🐣</button>
+
+    <audio id="cluck-sound" src="https://www.fesliyanstudios.com/play-mp3/6960" preload="auto"></audio>
+
+    <script>
+        const speciesNames = [
+            "Rousse", "Blanche", "Noire", "Cendrée", "Marans", "Gâtinaise", "Hollandaise", "Soie", "Araucana", "Sussex",
+            "Pékin", "Leghorn", "Coucou", "Orpington", "Barbezieux", "Wyandotte", "Faverolles", "Bresse", "Brahma", "Padoue",
+            "Australorp", "Sebright", "Java", "Sumatra", "Ancona", "Vorwerk", "Hambourg", "Langshan", "Campine", "Sultan",
+            "Dorking", "Minorque", "Maline", "Crèvecœur", "Rhode Island", "Plymouth", "New Hampshire", "Chantecler", "Cochin", "Lakenvelder"
+        ];
+
+        const speciesContainer = document.getElementById("speciesContainer");
+        const sound = document.getElementById("cluck-sound");
+
+        const speciesElements = {};
+        speciesNames.forEach(name => {
+            const div = document.createElement("div");
+            div.className = "species";
+            div.innerHTML = `<strong>${name}</strong><br><span id="sp-${name}">0</span>`;
+            speciesContainer.appendChild(div);
+            speciesElements[name] = div.querySelector("span");
+        });
+
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function updateCounters() {
+            const total = getRandomInt(300000, 350000);
+            const eggs = getRandomInt(10000, 60000);
+
+            document.getElementById("total").textContent = "Total : " + total.toLocaleString();
+            document.getElementById("eggs").textContent = "Œufs en vente : " + eggs.toLocaleString();
+
+            // Date texte d'intro
+            const now = new Date();
+            const dateStr = now.toLocaleDateString("fr-FR");
+            const timeStr = now.toLocaleTimeString("fr-FR", { hour: '2-digit', minute: '2-digit' });
+            document.getElementById("intro").textContent =
+                `Propriétaire exploitant d’une ferme avicole bio plein air. Calibre moyen 4. Effectif au ${dateStr} ${timeStr} : ${total.toLocaleString()}`;
+
+            // Répartition aléatoire
+            let remaining = total;
+            const counts = speciesNames.map((_, i) => {
+                if (i === speciesNames.length - 1) return remaining;
+                const count = getRandomInt(0, Math.floor(remaining / 2));
+                remaining -= count;
+                return count;
+            });
+
+            speciesNames.forEach((name, i) => {
+                speciesElements[name].textContent = counts[i].toLocaleString();
+            });
+
+            sound.currentTime = 0;
+            sound.play();
+        }
+
+        document.getElementById("adopt-btn").addEventListener("click", () => {
+            alert("Félicitations ! Une poule vous a adopté en retour 🐔❤️");
+        });
+
+        updateCounters();
+        setInterval(updateCounters, 400); // toutes les 400ms
+    </script>
+</body>
+
+</html>
