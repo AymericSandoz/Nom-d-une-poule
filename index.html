@@ -91,6 +91,22 @@
         #donate-btn:hover {
             background: #ffcc80;
         }
+
+        .night-mode {
+            background: #222;
+            color: #ccc;
+        }
+
+        .night-mode .species {
+            background: #333;
+            border-color: #444;
+            color: #aaa;
+        }
+
+        .night-mode button {
+            background: #444 !important;
+            color: #eee !important;
+        }
     </style>
 </head>
 
@@ -108,10 +124,80 @@
     <button id="feed-btn">🍽️ Nourrir les poules</button>
     <button id="donate-btn">🦊 Faire un don</button>
 
+    <div id="star-chicken" style="text-align:center; margin-top:30px;">
+        <h3>🐥 Poule en vedette</h3>
+        <p id="chicken-name">Chargement...</p>
+        <p id="chicken-behavior">...</p>
+    </div>
+
+    <div id="adoption-count" style="text-align:center; margin-top:30px;">
+        🐣 <strong><span id="adopted-count">0</span></strong> poules ont été adoptées grâce à vous.
+    </div>
+
+    <button id="toggle-night" style="margin: 30px auto; display:block;">
+        🌙 Éteindre le poulailler
+    </button>
+
+
 
     <audio id="cluck-sound" src="poule.mp3" preload="auto"></audio>
 
     <script>
+
+        // Données pour la poule en vedette
+        const chickenNames = ["Karimette", "Clémentine", "Ginette", "Coco", "Jean-Poule", "Gertrude", "Chickzilla", "Kevin", "Poulinette", "Laurette"];
+        const behaviors = [
+            "Elle a l'index surdéveloppé.",
+            "Elle est toute petite",
+            "Elle picore les cailloux avec passion.",
+            "Elle médite face au soleil levant.",
+            "Elle dort sur une seule patte pour impressionner les autres.",
+            "Elle a tenté de s’échapper en creusant un tunnel.",
+            "Elle pond uniquement en musique classique.",
+            "Elle a peur des œufs.",
+            "Elle suit un régime sans maïs.",
+            "Elle pense qu’elle est un canard."
+        ];
+
+
+        const speciesNames = [
+            "Rousse", "Blanche", "Noire", "Cendrée", "Marans", "Gâtinaise", "Hollandaise", "Soie", "Araucana", "Sussex",
+            "Pékin", "Leghorn", "Coucou", "Orpington", "Barbezieux", "Wyandotte", "Faverolles", "Bresse", "Brahma", "Padoue",
+            "Australorp", "Sebright", "Java", "Sumatra", "Ancona", "Vorwerk", "Hambourg", "Langshan", "Campine", "Sultan",
+            "Dorking", "Minorque", "Maline", "Crèvecœur", "Rhode Island", "Plymouth", "New Hampshire", "Chantecler", "Cochin", "Lakenvelder"
+        ];
+
+        function updateStarChicken() {
+            const name = chickenNames[getRandomInt(0, chickenNames.length - 1)];
+            const species = speciesNames[getRandomInt(0, speciesNames.length - 1)];
+            const behavior = behaviors[getRandomInt(0, behaviors.length - 1)];
+            document.getElementById("chicken-name").textContent = `${name} la ${species}`;
+            document.getElementById("chicken-behavior").textContent = behavior;
+        }
+        updateStarChicken();
+        setInterval(updateStarChicken, 7000); // change toutes les 7 secondes
+
+        // Compteur d’adoption
+        let adoptedCount = 0;
+        document.getElementById("adopt-btn").addEventListener("click", () => {
+            sound.currentTime = 0;
+            sound.play();
+            adoptedCount++;
+            document.getElementById("adopted-count").textContent = adoptedCount;
+            alert("Félicitations ! Une poule vous a adopté en retour 🐔❤️");
+        });
+
+        // Mode nuit
+        let isNight = false;
+        let countersActive = true;
+
+        document.getElementById("toggle-night").addEventListener("click", () => {
+            isNight = !isNight;
+            document.body.classList.toggle("night-mode", isNight);
+            countersActive = !isNight;
+            document.getElementById("toggle-night").textContent = isNight ? "☀️ Réveiller le poulailler" : "🌙 Éteindre le poulailler";
+        });
+
 
         document.getElementById("feed-btn").addEventListener("click", () => {
             alert("🍽️ Les poules picorent joyeusement dans l’herbe !");
@@ -120,13 +206,6 @@
         document.getElementById("donate-btn").addEventListener("click", () => {
             alert("🦊 Merci ! Votre don aidera à construire une barrière anti-renards !");
         });
-
-        const speciesNames = [
-            "Rousse", "Blanche", "Noire", "Cendrée", "Marans", "Gâtinaise", "Hollandaise", "Soie", "Araucana", "Sussex",
-            "Pékin", "Leghorn", "Coucou", "Orpington", "Barbezieux", "Wyandotte", "Faverolles", "Bresse", "Brahma", "Padoue",
-            "Australorp", "Sebright", "Java", "Sumatra", "Ancona", "Vorwerk", "Hambourg", "Langshan", "Campine", "Sultan",
-            "Dorking", "Minorque", "Maline", "Crèvecœur", "Rhode Island", "Plymouth", "New Hampshire", "Chantecler", "Cochin", "Lakenvelder"
-        ];
 
         const speciesContainer = document.getElementById("speciesContainer");
         const sound = document.getElementById("cluck-sound");
@@ -145,21 +224,23 @@
         }
 
         function updateCounters() {
-            const total = getRandomInt(3000000, 3000100);
-            const eggs = getRandomInt(31600, 32400);  // autour de 32k
-            // Date texte d'intro
+            if (!countersActive) return;
+
+            const total = getRandomInt(300000, 350000);
+            const eggs = getRandomInt(31600, 32400);
+
+            // Affiche dans intro
             const now = new Date();
             const dateStr = now.toLocaleDateString("fr-FR");
             const timeStr = now.toLocaleTimeString("fr-FR", { hour: '2-digit', minute: '2-digit' });
+            document.getElementById("intro").innerHTML = `
+    <p>Propriétaire exploitant d’une ferme avicole bio plein air. Calibre moyen 4.</p>
+    <p>Effectif au ${dateStr} ${timeStr} :</p>
+    <div id="big-total">${total.toLocaleString()}</div>
+  `;
 
             document.getElementById("eggs").textContent = "Œufs en vente : " + eggs.toLocaleString();
 
-            document.getElementById("intro").innerHTML = `
-  <p>Propriétaire exploitant d’une ferme avicole bio plein air. Calibre moyen 4.</p>
-  <p>Effectif au ${dateStr} ${timeStr} :</p>
-  <div id="big-total">${total.toLocaleString()}</div>
-`;
-            // Répartition aléatoire
             let remaining = total;
             const counts = speciesNames.map((_, i) => {
                 if (i === speciesNames.length - 1) return remaining;
@@ -181,12 +262,7 @@
             sound.play();
         }, 5000);
 
-        document.getElementById("adopt-btn").addEventListener("click", () => {
-            alert("Félicitations ! Une poule vous a adopté en retour 🐔❤️");
-        });
-
         updateCounters();
-        setInterval(updateCounters, 400); // toutes les 400ms
     </script>
 </body>
 
