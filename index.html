@@ -178,7 +178,10 @@
 
     <button id="adopt-btn">Adopter une poule 🐣</button>
     <button id="feed-btn">🍽️ Nourrir les poules</button>
-    <button id="donate-btn">🦊 Faire un don</button>
+    <a href="https://pots.lydia.me/collect/pots?id=70966-construire-une-barriere-pour-les-poules" target="_blank"
+        style="text-decoration: none;">
+        <button id="donate-btn">Faire un don 🦊 🪙</button>
+    </a>
 
     <div id="star-chicken" style="text-align:center; margin-top:30px;">
         <h3>🐥 Poule en vedette</h3>
@@ -251,10 +254,9 @@
             alert("🍽️ Les poules picorent joyeusement dans l’herbe !");
         });
 
-        document.getElementById("donate-btn").addEventListener("click", () => {
-            alert("🦊 Merci ! Votre don aidera à construire une barrière anti-renards !");
-        });
-
+        // document.getElementById("donate-btn").addEventListener("click", () => {
+        //     alert("🙏 Merci pour votre don ! Une barrière de plus contre les prédateurs !");
+        // });
         document.getElementById("toggle-night").addEventListener("click", () => {
             isNight = !isNight;
             document.body.classList.toggle("night-mode", isNight);
@@ -356,7 +358,10 @@
         <strong>Attaque de ${attacker.name} !!!</strong><br>
         <img src="${attacker.image}" alt="${attacker.name}" />
         <p>😱 ${dead} poules ont péri courageusement !</p>
-        <button onclick="donateAndRemove(this)">Faire un don 🪙</button>
+           <a href="https://pots.lydia.me/collect/pots?id=70966-construire-une-barriere-pour-les-poules" target="_blank"
+        style="text-decoration: none;">
+        <button onclick="donateAndRemove(this)">Faire un don 🦊 🪙</button>
+    </a>
       `;
 
             document.getElementById("attack-container").appendChild(div);
@@ -365,7 +370,7 @@
 
         function donateAndRemove(button) {
             button.parentElement.remove();
-            alert("🙏 Merci pour votre don ! Une barrière de plus contre les prédateurs !");
+            // alert("🙏 Merci pour votre don ! Une barrière de plus contre les prédateurs !");
         }
 
         setInterval(() => {
